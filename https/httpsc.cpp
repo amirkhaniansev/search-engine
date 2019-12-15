@@ -22,17 +22,36 @@
 #include <iostream>
 #include <string>
 
+#include <curl/curl.h>
+
 #include "../include/httpsc.hpp"
 
-std::string se::httpsc::get(const std::string url)
+size_t write_data(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    std::string base = url.substr(4, url.length() - 4);
-    auto response = base[0] != 's'  
-        ? httplib::Client(base.substr(4, base.length() - 4).c_str(), 80).Get("/")
-        : httplib::SSLClient(base.substr(3, base.length() - 3).c_str(), 443).Get("/");
+    std::size_t real_size = size * nmemb;
+    std::string* buff = (std::string*)userp;
+    std::string content((char*)contents, real_size);
+    
+    buff->append(content);
 
-    if(response->status != 200)
-        throw std::runtime_error("Invalid status...");
+    return real_size;
+}
 
-    return response->body;
+std::string alita::httpsc::get(const std::string url)
+{
+    CURL *curl;
+    CURLcode res;
+    std::string buffer;
+
+    curl = curl_easy_init();
+    if(!curl)
+        return std::string();
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+
+    return buffer;
 }

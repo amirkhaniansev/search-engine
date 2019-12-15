@@ -27,7 +27,7 @@
 
 #include "../include/httplib.hpp"
 
-namespace se {
+namespace alita {
     class httpsc {
         public:
             static std::string get(const std::string url);

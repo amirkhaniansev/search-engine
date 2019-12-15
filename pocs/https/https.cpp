@@ -21,26 +21,28 @@
 #include <iostream>
 #include <string>
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-
-#include "../../include/httplib.hpp"
+#include <curl/curl.h>
 
 int main(int argc, char** argv)
 {
-    int port = 443;    
-    std::string base_address = "github.com";
-    httplib::SSLClient client(base_address.c_str(), port);
-    
-    std::cerr << "Sending request to github.com..." << std::endl;
-    
-    auto response = client.Get("/");
-    if(response->status != 200) {
-        std::cerr << "Error Code : " << response->status << std::endl;
-        return 1;
-    }
+    CURL *curl;
+    CURLcode res;
 
-    std::cerr << "Printing body..." << std::endl;
-    std::cerr << response->body << std::endl;
+    curl = curl_easy_init();
+    if(curl) {
+        std::string escaped(curl_easy_escape(curl, "արփինետ.հայ", 30));
+        std::string url = "https://" + escaped;
+
+        std::cout << "URL : " << url << std::endl;
+
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+
+        res = curl_easy_perform(curl);
+
+        curl_easy_cleanup(curl);
+
+        std::cout << std::endl;
+    }
     
     return 0;
 }

@@ -25,8 +25,12 @@
 
 int main(int argc, char** argv)
 {
-    std::cerr << "Sending GET to GitHub... " << std::endl
-              << "Reponse Body ... " << se::httpsc::get("https://github.com");
+    if(argc != 2)
+        return 1;
+
+    std::string url(argv[1]);
+    std::cerr << "Sending GET to " << url << std::endl
+              << "Reponse Body ... " << alita::httpsc::get(std::string(url)) << std::endl;
               
     return 0;
 }
