@@ -22,5 +22,5 @@ jobs:
       run: cd ./mqueue/build && sudo make -B && cd ../../ 
     
     - uses: actions/checkout@v1
-    - name: Message Queue Library Build
+    - name: Parser Library Build
       run: cd ./parser/build && sudo make -B && cd ../../     
