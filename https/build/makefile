@@ -5,5 +5,5 @@ httpsc.o: ../../include/httpsc.hpp ../httpsc.cpp
 		g++ ../httpsc.cpp -fPIC -c -o httpsc.o
 
 packages:
-		sudo apt-get install libssl-dev
 		sudo apt-get install libcurl4-openssl-dev
+		sudo apt-get install libssl-dev
