@@ -43,6 +43,14 @@ void alita::crawler::set_concurreny_level(const std::size_t& concurrency_level)
     this->_concurrency_level = concurrency_level;
 }
 
+void alita::crawler::set_cache_size(const std::size_t& cache_size)
+{
+    if(cache_size == 0 || cache_size > 1000000)
+        throw std::invalid_argument("Invalid Cache Size");
+
+    this->_cache_size = cache_size;
+}
+
 void alita::crawler::set_initial_list(const std::vector<std::string>& links)
 {
     if(links.empty())
@@ -68,9 +76,9 @@ void alita::crawler::start()
     {
         try
         {
-            alita::lqueue::instance().dump();
             alita::queue_item item;
             alita::lqueue::instance().dequeue(&item);
+            alita::lqueue::instance().dump();
 
             std::string url(item._link._link);
             this->log("Link Dequeued", url);
@@ -80,8 +88,7 @@ void alita::crawler::start()
             this->log("Host", host);
 
             std::string content = alita::httpsc::get(url);
-            this->log("Content", content);
-
+        
             std::string message = "{\"Link\":\"" + url + "\",\"Content\":" + content + "\"}";
             this->_publisher.publish("Link Content", message);
 
@@ -93,10 +100,11 @@ void alita::crawler::start()
 
             std::unordered_set<std::string> links = parser.get_links();
             for(auto it = links.begin(); it != links.end(); it++) {
-                if(*it == url)
+                if(*it == url || this->_cache.find(*it) != this->_cache.end())
                     continue;
 
                 alita::lqueue::instance().enqueue(*it);
+                this->add(*it);
                 this->log("Link Enqueued", *it);
             }
         }
@@ -117,4 +125,13 @@ void alita::crawler::log(std::string title, std::string content)
 {
     if(this->_log)
         std::cerr << title << " : " << content << std::endl;
+}
+
+void alita::crawler::add(std::string link)
+{
+    // TODO cache should be chronogical
+    if(this->_cache.size() == this->_cache_size)
+        this->_cache.clear();
+
+    this->_cache.insert(link);
 }

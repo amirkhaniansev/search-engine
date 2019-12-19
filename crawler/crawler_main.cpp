@@ -22,17 +22,21 @@
 
 int main(int argc, char** argv)
 {
-    if(argc == 1)
-        return 1;
-        
     std::string url = "";
-    std::vector<std::string> links;
-    for(auto i = 1; i < argc; i++)
-        links.push_back(std::string(argv[i]));
+    std::vector<std::string> links = {
+        "https://www.list.am",
+        "https://www.eli.am",
+        "https://www.akumb.am",
+        "https://www.news.am",
+        "https://www.ysu.am",
+        "https://www.blognews.am",
+        "https://hy.wikipedia.org"
+    };
 
     alita::crawler crawler(url);
     
     crawler.set_concurreny_level(4);
+    crawler.set_cache_size(1000000);
     crawler.set_initial_list(links);
     crawler.set_log_flag(false);
     crawler.start();
