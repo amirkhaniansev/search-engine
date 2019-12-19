@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Build
 
 on: [push]
 
@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+
     - uses: actions/checkout@v1
-    - name: make
-      run: cd ./https/build && make -B && cd ../../
+    - name: HTTPS Library Build
+      run: cd ./https/build && sudo make -B && cd ../../
