@@ -44,7 +44,8 @@ namespace alita {
             static threadpool& instance(); 
             threadpool(threadpool const&)      = delete;
             void operator=(threadpool const&)  = delete;
-            void enqueue_work(entry_point_t entry_point, input_t input, callback_t callback);      
+            void enqueue_work(entry_point_t entry_point, input_t input, callback_t callback);     
+            void join(); 
             void state();
             void destroy();
         protected:

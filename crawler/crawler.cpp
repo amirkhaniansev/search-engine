@@ -21,6 +21,7 @@
 #include "../include/crawler.hpp"
 #include "../include/threadpool.hpp"
 #include "../include/lqueue.hpp"
+#include "../include/httpsc.hpp"
 
 alita::crawler::crawler(std::string publish_url) : _publisher(publish_url)
 {

@@ -113,6 +113,12 @@ void alita::threadpool::state()
     this->validate(pthread_mutex_unlock(&this->_workers_lock));
 }
 
+void alita::threadpool::join()
+{
+    for(auto it = this->_workers.begin(); it != this->_workers.end(); it++)
+        this->validate(pthread_join(*it, NULL));
+}
+
 void* alita::threadpool::start_routine(void* input)
 {
     alita::threadpool::instance().do_work((bool)input);
