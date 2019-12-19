@@ -18,16 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+#include <iostream>
+
 #include "../include/crawler.hpp"
 #include "../include/threadpool.hpp"
 #include "../include/lqueue.hpp"
 #include "../include/httpsc.hpp"
+#include "../include/parser.hpp"
 
 alita::crawler::crawler(std::string publish_url) : _publisher(publish_url)
 {
     this->_url = publish_url;
     this->_concurrency_level = 1;
     this->_publisher.declare("Link Content");
+
+    alita::lqueue::set_size(1000000000);
 }
 
 void alita::crawler::set_concurreny_level(const std::size_t& concurrency_level)
@@ -52,18 +57,48 @@ void alita::crawler::set_initial_list(const std::vector<std::string>& links)
         alita::lqueue::instance().enqueue(*it);
 }
 
+void alita::crawler::set_log_flag(const bool& flag)
+{
+    this->_log = flag;
+}
+
 void alita::crawler::start()
 {
-    auto crawl_starter = [](input_t input)
+    while (true)
     {
-        alita::output_t output;
-
         try
         {
-            while (true)
-            {
-                
-            }            
+            alita::lqueue::instance().dump();
+            alita::queue_item item;
+            alita::lqueue::instance().dequeue(&item);
+
+            std::string url(item._link._link);
+            this->log("Link Dequeued", url);
+            
+            std::size_t protocol = url.find("://");
+            std::string host = url.substr(protocol == std::string::npos ? protocol + 1 : protocol + 3);
+            this->log("Host", host);
+
+            std::string content = alita::httpsc::get(url);
+            this->log("Content", content);
+
+            std::string message = "{\"Link\":\"" + url + "\",\"Content\":" + content + "\"}";
+            this->_publisher.publish("Link Content", message);
+
+            if(content.empty())
+                continue;
+
+            alita::html_parser parser(host, content);
+            parser.parse();
+
+            std::unordered_set<std::string> links = parser.get_links();
+            for(auto it = links.begin(); it != links.end(); it++) {
+                if(*it == url)
+                    continue;
+
+                alita::lqueue::instance().enqueue(*it);
+                this->log("Link Enqueued", *it);
+            }
         }
         catch(const std::exception& e)
         {
@@ -71,9 +106,15 @@ void alita::crawler::start()
             std::string exception = e.what();
             std::string overall_error = error + exception;
 
-            output = (alita::output_t)overall_error.c_str();
-        }
+            std::cerr << overall_error << std::endl;
 
-        return output;        
-    };
+            alita::lqueue::instance().detach();
+        }            
+    }
+}
+
+void alita::crawler::log(std::string title, std::string content)
+{
+    if(this->_log)
+        std::cerr << title << " : " << content << std::endl;
 }

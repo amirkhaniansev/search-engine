@@ -32,11 +32,15 @@ namespace alita {
             crawler(std::string publish_url);
             void set_concurreny_level(const std::size_t& concurrency_level);
             void set_initial_list(const std::vector<std::string>& links);
+            void set_log_flag(const bool& flag);
             void start();
+        protected:
+            void log(std::string title, std::string  content);
         private:
             std::string _url;
             std::size_t _concurrency_level;
             std::vector<std::string> _links;
+            bool _log;
             cpub _publisher;
     };
 };

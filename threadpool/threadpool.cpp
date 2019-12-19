@@ -64,6 +64,7 @@ void alita::threadpool::create_worker(bool is_main)
 {
     pthread_t pthread_id;
     this->validate(pthread_create(&pthread_id, NULL, alita::threadpool::start_routine, (void*)is_main));
+    this->validate(pthread_detach(pthread_id));
 
     this->validate(pthread_mutex_lock(&this->_workers_lock));
     this->_workers.insert(pthread_id);
@@ -113,10 +114,9 @@ void alita::threadpool::state()
     this->validate(pthread_mutex_unlock(&this->_workers_lock));
 }
 
-void alita::threadpool::join()
+void alita::threadpool::exit()
 {
-    for(auto it = this->_workers.begin(); it != this->_workers.end(); it++)
-        this->validate(pthread_join(*it, NULL));
+    pthread_exit(0);
 }
 
 void* alita::threadpool::start_routine(void* input)

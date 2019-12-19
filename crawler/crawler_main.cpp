@@ -22,6 +22,20 @@
 
 int main(int argc, char** argv)
 {
+    if(argc == 1)
+        return 1;
+        
+    std::string url = "";
+    std::vector<std::string> links;
+    for(auto i = 1; i < argc; i++)
+        links.push_back(std::string(argv[i]));
+
+    alita::crawler crawler(url);
+    
+    crawler.set_concurreny_level(4);
+    crawler.set_initial_list(links);
+    crawler.set_log_flag(false);
+    crawler.start();
 
     return 0;
 }

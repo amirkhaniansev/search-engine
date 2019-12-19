@@ -37,10 +37,5 @@ int main(int argc, char** argv)
     alita::threadpool::instance().enqueue_work(print, input, call);
     alita::threadpool::instance().enqueue_work(print, input, call);
     alita::threadpool::instance().state();
-
-    alita::threadpool::instance().join();
-
-    alita::threadpool::instance().state();
-
-    return 0;
+    alita::threadpool::instance().exit();
 }
