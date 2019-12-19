@@ -31,4 +31,8 @@ jobs:
     
     - uses: actions/checkout@v1
     - name: POCs Build
-      run: cd ./pocs/build && sudo make -B && cd ../../     
+      run: cd ./pocs/build && sudo make -B && cd ../../       
+    
+    - uses: actions/checkout@v1
+    - name: Test Build
+      run: cd ./test/build && sudo make -B && cd ../../     
