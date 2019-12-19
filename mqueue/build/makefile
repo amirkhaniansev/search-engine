@@ -14,10 +14,10 @@ boost:
 
 rabbitmqc:
 		git clone https://github.com/alanxz/rabbitmq-c
-		cd ./rabbitmq-c && mkdir build && cd ./build && sudo cmake .. 
+		cd ./rabbitmq-c && mkdir build && cd ./build && sudo cmake .. && sudo cmake --build . --target install
 		sudo rm -rf ./rabbitmq-c
 
 rabbitmqcpp:
 		git clone https://github.com/alanxz/SimpleAmqpClient
-		cd ./SimpleAmqpClient && mkdir build && cd ./build && sudo cmake .. 
+		cd ./SimpleAmqpClient && mkdir build && cd ./build && sudo cmake .. && sudo cmake --build . --target install
 		sudo rm -rf ./SimpleAmqpClient
