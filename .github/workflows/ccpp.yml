@@ -16,3 +16,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Link Queue Library Build
       run: cd ./lqueue/build && sudo make -B && cd ../../
+    
+    - uses: actions/checkout@v1
+    - name: Message Queue Library Build
+      run: cd ./mqueue/build && sudo make -B && cd ../../     
