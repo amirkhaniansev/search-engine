@@ -1,3 +1,7 @@
+-- creating database
+CREATE DATABASE Alita;
+
+-- creating cache table
 CREATE TABLE Alita.Cache(
     ID          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Created     DATETIME        NOT NULL,
