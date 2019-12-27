@@ -7,8 +7,8 @@ CREATE TABLE Alita.Cache (
     Created         DATETIME        NOT NULL,
     Modified        DATETIME        NOT NULL,
     ProcessState    TINYINT         NOT NULL,
-    Link            VARCHAR(4000)   CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-    Content         VARCHAR(4000)   CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    Link            VARCHAR(4000)   CHARSET utf8,
+    Content         VARCHAR(4000)   CHARSET utf8,
 
     CONSTRAINT PK_CACHE_ID    PRIMARY KEY (ID)
 );
@@ -17,7 +17,7 @@ CREATE TABLE Alita.Cache (
 CREATE TABLE Alita.Word (
     ID              INT             NOT NULL AUTO_INCREMENT,
     Created         DATETIME        NOT NULL,
-    Content         VARCHAR(4000)   CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+    Content         VARCHAR(4000)   CHARSET utf8,
 
     CONSTRAINT WORD_ID PRIMARY KEY (ID)    
 );
