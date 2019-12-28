@@ -45,10 +45,17 @@ alita::alita_db::alita_db(const alita::db_connection_info& db_connection_info)
 
     this->_log = db_connection_info._log;
     this->driver = get_driver_instance();
-    this->connection = this->driver->connect(
-        db_connection_info._host,
-        db_connection_info._username,
-        db_connection_info._password);
+    
+    sql::ConnectOptionsMap map;
+    map["hostName"] = db_connection_info._host;
+    map["username"] = db_connection_info._username;
+    map["password"] = db_connection_info._password;
+    map["schema"] = db_connection_info._scheme;
+    map["OPT_RECONNECT"] = true;
+    map["CLIENT_MULTI_STATEMENTS"] = true;
+    map["OPT_CHARSET_NAME"] = "utf8";
+    
+    this->connection = this->driver->connect(map);
 
     this->connection->setSchema(db_connection_info._scheme);  
     this->connection->setAutoCommit(false);
@@ -75,8 +82,7 @@ int alita::alita_db::add_cache(std::wstring link, std::wstring content)
     try
     {
         std::unique_ptr<sql::PreparedStatement> pstmt;
-        std::unique_ptr<sql::ResultSet> res;
-
+        
         pstmt.reset(this->connection->prepareStatement("CALL usp_AddCache(?, ?, @_linkId)"));
 
         pstmt->setString(1, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(link));
@@ -84,13 +90,6 @@ int alita::alita_db::add_cache(std::wstring link, std::wstring content)
         
         if(!pstmt->execute())
             throw std::runtime_error("Unable to execute...");
-        
-        res.reset(pstmt->executeQuery("SELECT @_linkId AS Id"));
-        while(res -> next()) {
-            id = res -> getInt(0);
-        }
-
-        res->close();
         pstmt->close();
     }
     catch(const sql::SQLException& e)
