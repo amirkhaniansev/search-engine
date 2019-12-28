@@ -40,7 +40,7 @@ namespace alita {
         std::string _created;
     };
 
-    struct db_modifiable_model {
+    struct db_modifiable_model : public db_model {
         std::string _modified;
     };
 
@@ -76,7 +76,7 @@ namespace alita {
             void add_index(std::wstring word, std::wstring link, int frequency);
             void set_cache_state(int link_id, short state);
             alita::cache get_cache_by_id(int id);
-            std::vector<alita::search_result> search(std::wstring word, int last_id = 0);
+            std::vector<alita::search_result> search(std::wstring word, int last_id);
             ~alita_db();
         private:
             sql::Driver* driver;
