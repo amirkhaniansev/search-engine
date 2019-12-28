@@ -34,7 +34,7 @@ jobs:
       run: cd ./crawler/build && sudo make -B && cd ../../
       
     - uses: actions/checkout@v1
-    - name: Crawler Build
+    - name: DB API Build
       run: cd ./db/build && sudo make -B && cd ../../     
     
     - uses: actions/checkout@v1
