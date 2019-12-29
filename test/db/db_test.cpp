@@ -96,6 +96,8 @@ int main(int argc, char** argv)
     info._password = "password";
     info._scheme = "Alita";
 
+    alita::alita_db db(info);
+
     while(true) {
         std::wstring input;
         std::wcout << L"Test Method : ";
@@ -104,8 +106,6 @@ int main(int argc, char** argv)
         std::wcout << std::endl;
         std::wcout << L"You entered : " << input;
         std::wcout << std::endl;
-
-        alita::alita_db db(info);
 
         if(input == L"search")
             test_search(db);

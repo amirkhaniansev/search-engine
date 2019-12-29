@@ -44,7 +44,7 @@ alita::alita_db::alita_db(const alita::db_connection_info& db_connection_info)
         throw std::invalid_argument("Invalid Scheme.");
 
     this->_log = db_connection_info._log;
-    this->driver = get_driver_instance();
+    this->_driver = get_driver_instance();
     
     sql::ConnectOptionsMap map;
     map["hostName"] = db_connection_info._host;
@@ -55,18 +55,15 @@ alita::alita_db::alita_db(const alita::db_connection_info& db_connection_info)
     map["CLIENT_MULTI_STATEMENTS"] = true;
     map["OPT_CHARSET_NAME"] = "utf8";
     
-    this->connection = this->driver->connect(map);
+    this->_connection = this->_driver->connect(map);
 
-    this->connection->setSchema(db_connection_info._scheme);  
-    this->connection->setAutoCommit(false);
-
-    auto support = true;
-    this->connection->setClientOption("CLIENT_MULTI_STATEMENTS", &support);
+    this->_connection->setSchema(db_connection_info._scheme);  
+    this->_connection->setAutoCommit(true);
 }
 
 alita::alita_db::~alita_db()
 {
-    delete this->connection;
+    delete this->_connection;
 }
 
 int alita::alita_db::add_cache(std::wstring link, std::wstring content)
@@ -83,13 +80,26 @@ int alita::alita_db::add_cache(std::wstring link, std::wstring content)
     {
         std::unique_ptr<sql::PreparedStatement> pstmt;
         
-        pstmt.reset(this->connection->prepareStatement("CALL usp_AddCache(?, ?, @_linkId)"));
+        pstmt.reset(this->_connection->prepareStatement("CALL usp_AddCache(?, ?, @out)"));
 
         pstmt->setString(1, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(link));
         pstmt->setString(2, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(content));
         
         if(!pstmt->execute())
             throw std::runtime_error("Unable to execute...");
+        
+        this->clear(pstmt);
+        
+        pstmt.reset(this->_connection->prepareStatement("SELECT @out AS ID"));
+        if(!pstmt->execute())
+            throw std::runtime_error("Unable to execute...");
+        
+        std::unique_ptr<sql::ResultSet> res;
+        res.reset(pstmt->getResultSet());
+        while(res->next())
+            id = res->getInt("ID");
+
+        res->close();
         pstmt->close();
     }
     catch(const sql::SQLException& e)
@@ -121,7 +131,7 @@ void alita::alita_db::add_index(std::wstring word, std::wstring link, int freque
     {
         std::unique_ptr<sql::PreparedStatement> pstmt;
 
-        pstmt.reset(this->connection->prepareStatement("CALL usp_AddIndex(?, ?, ?)"));
+        pstmt.reset(this->_connection->prepareStatement("CALL usp_AddIndex(?, ?, ?)"));
 
         pstmt->setString(1, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(word));
         pstmt->setString(2, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(link));
@@ -130,7 +140,7 @@ void alita::alita_db::add_index(std::wstring word, std::wstring link, int freque
         if(!pstmt->execute())
             throw std::runtime_error("Unable to execute...");
         
-        pstmt->close();
+        this->clear(pstmt);
     }
     catch(const sql::SQLException& e)
     {
@@ -156,7 +166,7 @@ alita::cache alita::alita_db::get_cache_by_id(int id)
         std::unique_ptr<sql::PreparedStatement> pstmt;
         std::unique_ptr<sql::ResultSet> res;
 
-        pstmt.reset(this->connection->prepareStatement("CALL usp_GetCacheById(?)"));
+        pstmt.reset(this->_connection->prepareStatement("CALL usp_GetCacheById(?)"));
         pstmt->setInt(1, id);
         
         if(!pstmt->execute())
@@ -171,9 +181,11 @@ alita::cache alita::alita_db::get_cache_by_id(int id)
             cache._created = res->getString("Created");
             cache._modified = res->getString("Modified");
             cache._process_state = res->getInt("ProcessState");
-        };
+        }; 
+
+        while(pstmt->getMoreResults())
+            res.reset(pstmt->getResultSet());
         
-        res->close();
         pstmt->close();
     }
     catch(const sql::SQLException& e)
@@ -205,7 +217,7 @@ std::vector<alita::search_result> alita::alita_db::search(std::wstring word, int
         std::unique_ptr<sql::PreparedStatement> pstmt;
         std::unique_ptr<sql::ResultSet> res;
 
-        pstmt.reset(this->connection->prepareStatement("CALL usp_Search(?, ?)"));
+        pstmt.reset(this->_connection->prepareStatement("CALL usp_Search(?, ?)"));
 
         pstmt->setString(1, std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(word));
         pstmt->setInt(2, last_id);
@@ -223,8 +235,10 @@ std::vector<alita::search_result> alita::alita_db::search(std::wstring word, int
             s._word = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().from_bytes(res->getString("Word"));
             results.push_back(s);
         }
-
-        res->close();
+        
+        while(pstmt->getMoreResults())
+            res.reset(pstmt->getResultSet());
+        
         pstmt->close();
     }
     catch(const sql::SQLException& e)
@@ -253,15 +267,15 @@ void alita::alita_db::set_cache_state(int link_id, short state)
     {
         std::unique_ptr<sql::PreparedStatement> pstmt;
 
-        pstmt.reset(this->connection->prepareStatement("CALL usp_SetCacheState(?, ?)"));
+        pstmt.reset(this->_connection->prepareStatement("CALL usp_SetCacheState(?, ?)"));
 
         pstmt->setInt(1, link_id);
         pstmt->setInt(2, state);
         
-        if(!pstmt->execute())
+        if(!pstmt->executeUpdate())
             throw std::runtime_error("Unable to execute...");
         
-        pstmt->close();
+        this->clear(pstmt);
     }
     catch(const sql::SQLException& e)
     {
@@ -279,4 +293,30 @@ void alita::alita_db::log(std::string message)
 {
     if(this->_log)
         std::cerr << message << std::endl;
+}
+
+
+void alita::alita_db::clear(std::unique_ptr<sql::Statement>& statement)
+{
+    std::unique_ptr<sql::ResultSet> res;
+    do
+    {
+        res.reset(statement->getResultSet());
+        res->close();
+    } while (statement->getMoreResults()); 
+
+    statement->close();   
+}
+
+
+void alita::alita_db::clear(std::unique_ptr<sql::PreparedStatement>& statement)
+{
+    std::unique_ptr<sql::ResultSet> res;
+    do
+    {
+        res.reset(statement->getResultSet());
+        res->close();
+    } while (statement->getMoreResults());    
+
+    statement->close();
 }

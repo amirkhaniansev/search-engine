@@ -23,8 +23,11 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <cppconn/driver.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
 
 namespace alita {
     struct db_connection_info {
@@ -79,10 +82,12 @@ namespace alita {
             std::vector<alita::search_result> search(std::wstring word, int last_id);
             ~alita_db();
         private:
-            sql::Driver* driver;
-            sql::Connection* connection;
+            sql::Driver* _driver;
+            sql::Connection* _connection;
             bool _log;
             void log(std::string message);
+            void clear(std::unique_ptr<sql::Statement>& statement);
+            void clear(std::unique_ptr<sql::PreparedStatement>& statement);
     };
 };
 
