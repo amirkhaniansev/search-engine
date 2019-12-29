@@ -8,7 +8,7 @@ CREATE TABLE Alita.Cache (
     Modified        DATETIME        NOT NULL,
     ProcessState    TINYINT         NOT NULL,
     Link            VARCHAR(4000)   CHARSET utf8,
-    Content         VARCHAR(21844)   CHARSET utf8,
+    Content         LONGTEXT        CHARSET utf8,
 
     CONSTRAINT PK_CACHE_ID    PRIMARY KEY (ID)
 );
@@ -43,8 +43,8 @@ SHOW WARNINGS;
 DELIMITER //
 DROP PROCEDURE IF EXISTS Alita.usp_AddCache //
 CREATE PROCEDURE Alita.usp_AddCache (
-    IN  _link    VARCHAR(4000) CHARSET utf8,
-    IN  _content VARCHAR(21844) CHARSET utf8,
+    IN  _link    VARCHAR(4000)  CHARSET utf8,
+    IN  _content LONGTEXT       CHARSET utf8,
     OUT _linkId  INT
 )
 PROC_START : BEGIN
