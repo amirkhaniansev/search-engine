@@ -6,8 +6,6 @@ CREATE PROCEDURE Alita.usp_AddIndex (
     IN _frequency   INT
 )
 PROC_START : BEGIN
-    START TRANSACTION;
-
     SET @wordId := NULL;
     SELECT @wordId := Id FROM Alita.Word WHERE Content = _word;
     IF @wordId IS NULL THEN
@@ -32,7 +30,6 @@ PROC_START : BEGIN
     SET Modified = NOW(),
         Frequency = _frequency
         WHERE WordID = @wordId AND LinkID = @linkId;
-        
-    COMMIT;
 END //
 DELIMITER ;
+SHOW WARNINGS;

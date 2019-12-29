@@ -6,8 +6,6 @@ CREATE PROCEDURE Alita.usp_AddCache (
     OUT _linkId  INT
 )
 PROC_START : BEGIN
-    START TRANSACTION;
-
     SET @id := NULL;
     SELECT @id := Id FROM Alita.Cache WHERE Link = _link;
     SET _linkId := @id;
@@ -24,7 +22,6 @@ PROC_START : BEGIN
         Modified = NOW(), 
         ProcessState = 0 
         WHERE Id = @id AND ProcessState = 2;
-      
-    COMMIT;
 END //
 DELIMITER ;
+SHOW WARNINGS;

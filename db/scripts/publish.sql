@@ -45,8 +45,6 @@ CREATE PROCEDURE Alita.usp_AddCache (
     OUT _linkId  INT
 )
 PROC_START : BEGIN
-    START TRANSACTION;
-
     SET @id := NULL;
     SELECT @id := Id FROM Alita.Cache WHERE Link = _link;
     SET _linkId := @id;
@@ -63,10 +61,9 @@ PROC_START : BEGIN
         Modified = NOW(), 
         ProcessState = 0 
         WHERE Id = @id AND ProcessState = 2;
-      
-    COMMIT;
 END //
 DELIMITER ;
+SHOW WARNINGS;
 
 -- create procedure usp_AddIndex
 DELIMITER //
@@ -77,8 +74,6 @@ CREATE PROCEDURE Alita.usp_AddIndex (
     IN _frequency   INT
 )
 PROC_START : BEGIN
-    START TRANSACTION;
-
     SET @wordId := NULL;
     SELECT @wordId := Id FROM Alita.Word WHERE Content = _word;
     IF @wordId IS NULL THEN
@@ -103,10 +98,9 @@ PROC_START : BEGIN
     SET Modified = NOW(),
         Frequency = _frequency
         WHERE WordID = @wordId AND LinkID = @linkId;
-        
-    COMMIT;
 END //
 DELIMITER ;
+SHOW WARNINGS;
 
 -- create procedure usp_GetCacheById
 DELIMITER //
@@ -153,8 +147,7 @@ CREATE PROCEDURE Alita.usp_SetCacheState (
     IN _state   TINYINT
 )
 BEGIN
-    START TRANSACTION;
     UPDATE Alita.Cache SET ProcessState = _state WHERE Id = _linkId;
-    COMMIT;
 END //
 DELIMITER ;
+SHOW WARNINGS;
