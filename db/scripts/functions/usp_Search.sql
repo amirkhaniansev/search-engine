@@ -14,7 +14,6 @@ BEGIN
         INNER JOIN Alita.Index i ON w.Id = i.WordId 
         INNER JOIN Alita.Cache c ON i.LinkId = c.Id
         WHERE w.Content = _word  AND
-              c.ProcessState = 2 AND
               i.Id > _lastId 
         ORDER BY i.Frequency DESC, 
                  i.Modified  DESC,
