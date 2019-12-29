@@ -40,7 +40,6 @@ namespace alita {
             std::string content;
             myhtml* html;
             myhtml_tree* tree;
-            myhtml_collection* collection;
             void add(std::unordered_map<std::wstring, int>* words, std::wstring& text);
     };
 };

@@ -39,6 +39,7 @@ void alita::indexer::start()
     while(true) {
         try
         {
+            std::cerr << "Waiting To Message From Publisher..." <<  std::endl;
             message = this->_subscriber.get_message("Link ID");
             std::cerr << "Message From Publisher : " << message << std::endl;
             if(message.empty())
@@ -65,6 +66,10 @@ void alita::indexer::start()
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';
+        }
+        catch(...)
+        {
+            std::cerr << "Error" << '\n';
         }        
     }
 }

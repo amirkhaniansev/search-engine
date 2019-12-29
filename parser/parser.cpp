@@ -50,11 +50,11 @@ void alita::html_parser::parse()
 
 std::unordered_set<std::string> alita::html_parser::get_links()
 {    
-    this->collection = myhtml_get_nodes_by_attribute_key(this->tree, NULL, NULL, "href", 4, NULL);
+    auto coll = myhtml_get_nodes_by_attribute_key(this->tree, NULL, NULL, "href", 4, NULL);
 
     std::unordered_set<std::string> set;
-    for(auto i = 0; i < this->collection->length; i++) {
-        auto node = this->collection->list[i];
+    for(auto i = 0; i < coll->length; i++) {
+        auto node = coll->list[i];
         for(auto j = myhtml_node_attribute_first(node); j != myhtml_node_attribute_last(node); j = myhtml_attribute_next(j)) {
             if(strcmp(myhtml_attribute_key(j, NULL), "href") != 0)
                 continue;
@@ -70,6 +70,8 @@ std::unordered_set<std::string> alita::html_parser::get_links()
         }
     }
 
+    myhtml_collection_destroy(coll);
+    
     return set;
 }
 
@@ -140,6 +142,9 @@ std::unordered_map<std::wstring, int> alita::html_parser::get_content()
             
             auto length = 0UL;
             auto str = myhtml_node_text(node, &length);
+            if(str == NULL)
+                continue;
+
             auto cxxstr = std::string(str, length);
             auto text = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().from_bytes(cxxstr);
             this->add(&result, text);
@@ -175,8 +180,7 @@ void alita::html_parser::add(std::unordered_map<std::wstring, int>* words, std::
 }
 
 alita::html_parser::~html_parser()
-{
-    myhtml_collection_destroy(this->collection);
+{  
     myhtml_tree_destroy(this->tree);
     myhtml_destroy(this->html);
 }
