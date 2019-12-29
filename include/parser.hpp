@@ -23,6 +23,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
 
 #include <myhtml/api.h>
 
@@ -31,7 +32,7 @@ namespace alita {
         public:
             html_parser(std::string base_url, std::string content);
             void parse();
-            std::string get_content();
+            std::unordered_map<std::wstring, int> get_content();
             std::unordered_set<std::string> get_links();
             ~html_parser();
         private:
@@ -40,6 +41,7 @@ namespace alita {
             myhtml* html;
             myhtml_tree* tree;
             myhtml_collection* collection;
+            void add(std::unordered_map<std::wstring, int>* words, std::wstring& text);
     };
 };
 
