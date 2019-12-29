@@ -35,11 +35,13 @@ std::unordered_map<std::wstring, alita::search_result> alita::search::query(cons
     if(query._last_id < 0)
         throw std::invalid_argument("Invalid last Index ID");
 
+    std::wcout << L"Searching For : " << query._query << std::endl;
+
     std::wstring word;
     std::unordered_set<std::wstring> words;
     std::unordered_map<std::wstring, alita::search_result> results;
     for(auto it = query._query.begin(); it != query._query.end(); it++) {
-        if(*it != ' ') {
+        if(*it != L' ' && it + 1 != query._query.end()) {
             word += *it; 
             continue;
         };
@@ -49,9 +51,11 @@ std::unordered_map<std::wstring, alita::search_result> alita::search::query(cons
             continue;
         }
 
+        std::wcout << L"Word Found " << word << std::endl;
         words.insert(word);
 
         auto result = this->_db.search(word, query._last_id);
+        std::wcout << L"Result Count For : " << result.size() << std::endl;
         for(auto rit = result.begin(); rit != result.end(); rit++)
             results[rit->_page] = *rit;
         
