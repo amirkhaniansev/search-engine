@@ -70,14 +70,20 @@ void alita::indexer::start()
 }
 
 void alita::indexer::index(std::wstring& link, std::wstring& content)
-{
+{  
+    std::wcerr << L"Indexing started for " << link << std::endl;
+
+    std::wcerr << L"Parsing started for " << link << std::endl;
     auto url = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(link);
     auto con = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(content);
     auto parser = alita::html_parser(url, con);
     parser.parse();
+    std::wcerr << L"Parsing ended for " << link << std::endl;
 
+    std::wcerr << L"Adding entries to DB for " << link << std::endl;
     auto words = parser.get_content();
     for(auto it = words.begin(); it != words.end(); it++) {
         this->_db.add_index(it->first, link, it->second);
     }
+    std::wcerr << L"Added entries to DB for " << link << std::endl;
 }
