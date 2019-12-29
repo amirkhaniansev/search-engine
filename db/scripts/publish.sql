@@ -8,10 +8,11 @@ CREATE TABLE Alita.Cache (
     Modified        DATETIME        NOT NULL,
     ProcessState    TINYINT         NOT NULL,
     Link            VARCHAR(4000)   CHARSET utf8,
-    Content         VARCHAR(4000)   CHARSET utf8,
+    Content         VARCHAR(21844)   CHARSET utf8,
 
     CONSTRAINT PK_CACHE_ID    PRIMARY KEY (ID)
 );
+SHOW WARNINGS;
 
 -- create table Word
 CREATE TABLE Alita.Word (
@@ -21,6 +22,7 @@ CREATE TABLE Alita.Word (
 
     CONSTRAINT WORD_ID PRIMARY KEY (ID)    
 );
+SHOW WARNINGS;
 
 -- create table Index
 CREATE TABLE Alita.Index (
@@ -35,13 +37,14 @@ CREATE TABLE Alita.Index (
     CONSTRAINT INDEX_WORD_ID    FOREIGN KEY (WordID) REFERENCES Alita.Word(ID),
     CONSTRAINT INDEX_LINK_ID    FOREIGN KEY (LinkID) REFERENCES Alita.Cache(ID) 
 );
+SHOW WARNINGS;
 
 -- create procedure usp_AddCache
 DELIMITER //
 DROP PROCEDURE IF EXISTS Alita.usp_AddCache //
 CREATE PROCEDURE Alita.usp_AddCache (
     IN  _link    VARCHAR(4000) CHARSET utf8,
-    IN  _content VARCHAR(4000) CHARSET utf8,
+    IN  _content VARCHAR(21844) CHARSET utf8,
     OUT _linkId  INT
 )
 PROC_START : BEGIN

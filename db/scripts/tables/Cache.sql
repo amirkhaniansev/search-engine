@@ -4,7 +4,8 @@ CREATE TABLE Alita.Cache (
     Modified        DATETIME        NOT NULL,
     ProcessState    TINYINT         NOT NULL,
     Link            VARCHAR(4000)   CHARSET utf8,
-    Content         VARCHAR(4000)   CHARSET utf8,
+    Content         VARCHAR(21844)   CHARSET utf8,
 
     CONSTRAINT PK_CACHE_ID    PRIMARY KEY (ID)
 );
+SHOW WARNINGS;
