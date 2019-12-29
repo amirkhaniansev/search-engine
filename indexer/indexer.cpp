@@ -19,8 +19,11 @@
 **/
 
 #include <unordered_map>
+#include <locale>
+#include <codecvt>
 
 #include "../include/indexer.hpp"
+#include "../include/parser.hpp"
 
 alita::indexer::indexer(std::string subscribe_url, alita::db_connection_info info)
     : _subscriber(subscribe_url), _db(info)
@@ -68,13 +71,12 @@ void alita::indexer::start()
 
 void alita::indexer::index(std::wstring& link, std::wstring& content)
 {
-    std::unordered_map<std::wstring, int> words;
-    std::wstring word;
+    auto url = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(link);
+    auto con = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(content);
+    auto parser = alita::html_parser(url, con);
+    parser.parse();
 
-    for(auto it = content.begin(); it != content.end(); it++) {
-        
-    }
-    
+    auto words = parser.get_content();
     for(auto it = words.begin(); it != words.end(); it++) {
         this->_db.add_index(it->first, link, it->second);
     }
