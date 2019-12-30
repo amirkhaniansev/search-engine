@@ -22,5 +22,17 @@
 
 int main(int argc, char** argv)
 {
+    alita::server server("localhost", 9902);
+
+    try
+    {
+        server.start();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        server.stop();
+    }
+    
     return 0;
 }

@@ -18,8 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
+#ifndef __SERVER_HPP__
+#define __SERVER_HPP__
+
+#include "httplib.hpp"
+
+#include <iostream>
+#include <string>
+
 namespace alita {
     class server {
-
+        public:
+            server(std::string host, int port);
+            void start();
+            void stop();
+        private:
+            std::string _host;
+            int _port;
+            bool _started;
+            httplib::Server _srv;
     };
 };
+
+#endif
