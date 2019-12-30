@@ -24,13 +24,14 @@ int main(int argc, char** argv)
 {
     std::string url = "";
     std::vector<std::string> links = {
+        "https://www.google.am",
         "https://www.list.am",
         "https://www.eli.am",
-        "https://www.akumb.am",
         "https://www.news.am",
         "https://www.ysu.am",
         "https://www.blognews.am",
-        "https://hy.wikipedia.org"
+        "https://hy.wikipedia.org",
+        "https://www.akumb.am",
     };
 
     alita::crawler crawler(url);
