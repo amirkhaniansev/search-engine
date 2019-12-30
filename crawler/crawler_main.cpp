@@ -30,8 +30,7 @@ int main(int argc, char** argv)
         "https://www.news.am",
         "https://www.ysu.am",
         "https://www.blognews.am",
-        "https://hy.wikipedia.org",
-        "https://www.akumb.am",
+        "https://hy.wikipedia.org"
     };
 
     alita::crawler crawler(url);
